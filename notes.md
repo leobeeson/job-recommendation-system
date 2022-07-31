@@ -3,14 +3,14 @@
 ## Work Breakdown Structure
 
 ### Recommendations
-* Map size of data:
-    * Number of `user` records.
-    * Number of `job` records.
-    * Number of `activity` records.
-* Count number of `activity` records per `user`-`job`.
-    * i.e. number of times a user performed the same `activity` for an individual `job`.
-    * Perhaps a `user` visited the same `job` more than once.
-* Construct a `user`-`job` matrix.
+* Map size of data: #DONE
+    * Number of `user` records. #DONE
+    * Number of `job` records. #DONE
+    * Number of `activity` records. #DONE
+* Count number of `activity` records per `user`-`job`. #DONE
+    * i.e. number of times a user performed the same `activity` for an individual `job`. #DONE
+    * Perhaps a `user` visited the same `job` more than once. #DONE
+* Construct a `user`-`job` matrix. #FOCUS
 * Weigh `user`-`job` matrix.
     * Set a cutoff for maximum number of `activity.redirect`.
 * Create ALS model.
