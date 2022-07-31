@@ -31,6 +31,49 @@
 * gensim.models.doc2vec
 
 
+## Assumptions
+
+### Funnel
+* A good funnel is: `(a impression -> a redirect) * n`
+    * User checked out the same job at the employer multiple times, always starting from Bright.
+    * The larger `n`, probably the more relevant the job for the user (strong assumption).
+    * If `n == 1`, maybe the user did not like the job after looking at it in from the employer's site (weak assumption).
+* An efficient funnel is: `(a impression -> b redirect) * n` where a < b
+    * User might have bookmarked employers job page.
+* An inefficient funnel is: `(a impression -> b redirect) * n` where a > b
+    * User might have missed the impression several times.
+    * User was not initially attracted to the job (last resort).
+    * User applied to the job, but impressions kept being shown to him/her in subsequent searches.
+* A bad funnel is: `(1 impression -> 0 redirect) * n`
+    * User is not finding anything attractive.
+    * User is being engaged at the wrong moment (e.g. doesn't have time to redirect and dive deeper).
+* A strange funnel is: `(0 impression -> 1 redirect) * n`
+    * 813 users redirected to a specific job without having a tracked impression.
+    * 22 jobs had redirections without having tracked impressions.
+
+### Scaling
+* `max(impression) == 10`
+* `max(redirect) == 10`
+* `scaled_redirect == redirect * 2`
+* `implicit_score == scaled_redirect + impression - (impression - redirect)`
+* `min(implicit_score) == 2 where redirect > 0`
+* `min(implicit_score) == 1 where redirect == 0 & impression > 0`
+
+
+## Data Models
+
+```python
+{
+    user_id:int: {
+        job_id:int {
+            impression:str : count:int,
+            redirect:str: count:int,
+            implicit_score:int score:func(redirect*2 impression - (impression - redirect))
+        }
+    }
+}
+```
+
 ## Questions
 * How many impressions per user per unit of time?
 * How many redirects per user per unit of time?

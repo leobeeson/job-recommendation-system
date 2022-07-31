@@ -145,3 +145,21 @@ user_job_redirects_max_interactions_p50 = user_job_redirects_max_interactions.qu
 user_job_redirects_max_interactions_p95 = user_job_redirects_max_interactions.quantile(q=0.95) # 5
 user_job_redirects_max_interactions_p99 = user_job_redirects_max_interactions.quantile(q=0.99) # 8
 user_job_redirects_max_interactions_max = user_job_redirects_max_interactions.max() # 31
+
+
+# Convert to numpy and clip:
+import gc
+
+user_job_impressions_df = pandas.crosstab(impressions_df.user_id, impressions_df.job_id)
+user_job_impressions_arr = user_job_impressions_df.to_numpy(dtype=int)
+user_job_impressions_arr.shape # (16416, 7451)
+user_job_impressions_arr.clip(max=10, out=user_job_impressions_arr)
+del user_job_impressions_df
+gc.collect()
+
+user_job_redirects_df = pandas.crosstab(redirects_df.user_id, redirects_df.job_id)
+user_job_redirects_arr = user_job_redirects_df.to_numpy(dtype=int)
+user_job_redirects_arr.shape # (11562, 4290)
+user_job_redirects_arr.clip(max=10, out=user_job_redirects_arr)
+del user_job_redirects_df
+gc.collect()
