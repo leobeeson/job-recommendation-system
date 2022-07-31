@@ -10,11 +10,22 @@
 * Count number of `activity` records per `user`-`job`. #DONE
     * i.e. number of times a user performed the same `activity` for an individual `job`. #DONE
     * Perhaps a `user` visited the same `job` more than once. #DONE
-* Construct a `user`-`job` matrix. #FOCUS
-* Weigh `user`-`job` matrix.
-    * Set a cutoff for maximum number of `activity.redirect`.
-* Create ALS model.
-* Fit ALS model.
+* Construct a `user`-`job` matrix. #DONE
+* Weigh `user`-`job` matrix. #DONE
+    * Set a cutoff for maximum number of `activity.redirect`. #DONE
+* Create ALS model. #DONE
+* Fit ALS model. #DONE
+* Refactor code into `Recommender` class: #FOCUS
+    * read_activity_data()
+    * calculate_implicit_score()
+    * add_implicit_scores()
+    * generate_user_job_triples()
+    * get_unique_engaged_users()
+    * get_unique_engaged_jobs()
+    * build_sparse_matrix()
+    * train_als_model()
+    * get_recommendations_single()
+    * get_recommendations_bulk()
 
 ### Employer Clustering
 * Build lists of `job.description` per `job.employer`.
@@ -81,6 +92,9 @@
     * Do most users use it only once?
     * Do most users use it multiple times during a condensed period of time? (i.e. while job hunting)
     * Can users return to bright after a couple months/years of work experience?
+
+## Research
+* Why is AlternatingLeastSquares recommended for implicit feedback?
 
 
 ## Future Ideas
