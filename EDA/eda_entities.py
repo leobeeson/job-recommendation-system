@@ -65,6 +65,7 @@ total_activity_records = sum(activity_types.values()) # 382,815
 total_impression_records = activity_types["impression"] # 301,517
 total_redirect_records = activity_types["redirect"] # 81,298
 
+# User activity funnel statistics:
 unique_users_impressed = list(users_with_impressions.keys())
 unique_users_redirected = list(users_with_redirects.keys())
 unique_users_engaged = set(list(unique_users_impressed + unique_users_redirected))
@@ -78,6 +79,21 @@ total_impressed_users_never_redirect = len(impressed_users_never_redirect) # 5,6
 
 redirected_non_impressed_users = [user for user in unique_users_redirected if user not in unique_users_impressed]
 total_redirected_non_impressed_users = len(redirected_non_impressed_users) # 813
+
+# Job activity funnel statistics:
+unique_jobs_impressed = list(jobs_with_impressions.keys())
+unique_jobs_redirected = list(jobs_with_redirects.keys())
+unique_jobs_engaged = set(list(unique_jobs_impressed + unique_jobs_redirected))
+
+total_unique_jobs_impressed = len(unique_jobs_impressed) # 7,451
+total_unique_jobs_redirected = len(unique_jobs_redirected) # 4,290
+total_unique_jobs_engaged = len(unique_jobs_engaged) # 7,473
+
+impressed_jobs_never_redirect = [user for user in unique_jobs_impressed if user not in unique_jobs_redirected]
+total_impressed_jobs_never_redirect = len(impressed_jobs_never_redirect) # 3,183
+
+redirected_non_impressed_jobs = [user for user in unique_jobs_redirected if user not in unique_jobs_impressed]
+total_redirected_non_impressed_jobs = len(redirected_non_impressed_jobs) # 22
 
 # Frequency of activity per activity type:
 len(count_jobs_impression) # 7,451
