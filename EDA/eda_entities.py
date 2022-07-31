@@ -31,30 +31,53 @@ total_users = len(users) # 95,600
 sum(list(count_users.values())) # 95,600
 
 
-# Count impressions by type and get frequency distribution:
+# Count activity and funnel statistics:
 count_jobs_impression = defaultdict(int)
 count_jobs_redirect = defaultdict(int)
 count_users_impression = defaultdict(int)
 count_users_redirect = defaultdict(int)
 activity_types = defaultdict(int)
+users_with_impressions = defaultdict(int)
+users_with_redirects = defaultdict(int)
+jobs_with_impressions = defaultdict(int)
+jobs_with_redirects = defaultdict(int)
 with open("../dataset/activities.jsonl") as input_file:
     for line in input_file:
         activity = json.loads(line)
         type_ = activity["type"]
+        user_id = activity["user_id"]
+        job_id = activity["job_id"]
         activity_types[type_] += 1
         if type_ == "impression":
             count_jobs_impression[activity["job_id"]] += 1
             count_users_impression[activity["user_id"]] += 1
+            users_with_impressions[user_id] += 1
+            jobs_with_impressions[job_id] += 1
         elif type_ == "redirect":
             count_jobs_redirect[activity["job_id"]] += 1
             count_users_redirect[activity["user_id"]] += 1
+            users_with_redirects[user_id] += 1
+            jobs_with_redirects[job_id] += 1
         else:
             print(f"Unexpected Activity:\n{activity}")
-        
 
 total_activity_records = sum(activity_types.values()) # 382,815
 total_impression_records = activity_types["impression"] # 301,517
 total_redirect_records = activity_types["redirect"] # 81,298
+
+unique_users_impressed = list(users_with_impressions.keys())
+unique_users_redirected = list(users_with_redirects.keys())
+unique_users_engaged = set(list(unique_users_impressed + unique_users_redirected))
+
+total_unique_users_impressed = len(unique_users_impressed) # 16,416
+total_unique_users_redirected = len(unique_users_redirected) # 11,562
+total_unique_users_engaged = len(unique_users_engaged) # 17,229
+
+impressed_users_never_redirect = [user for user in unique_users_impressed if user not in unique_users_redirected]
+total_impressed_users_never_redirect = len(impressed_users_never_redirect) # 5,667
+
+redirected_non_impressed_users = [user for user in unique_users_redirected if user not in unique_users_impressed]
+total_redirected_non_impressed_users = len(redirected_non_impressed_users) # 813
 
 # Frequency of activity per activity type:
 len(count_jobs_impression) # 7,451
