@@ -3,9 +3,6 @@ import pytest
 from recommender import Recommender
 
 
-
-
-
 @pytest.fixture(scope='module', autouse=True)
 def activities_dto():
     recommender = Recommender("tests/test_data/test_activities.jsonl")

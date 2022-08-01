@@ -15,7 +15,7 @@
     * Set a cutoff for maximum number of `activity.redirect`. #DONE
 * Create ALS model. #DONE
 * Fit ALS model. #DONE
-* Refactor code into `Recommender` class: #FOCUS
+* Refactor code into `Recommender` class: #DONE
     * read_activity_data() #DONE
     * calculate_implicit_score() #DONE
     * add_implicit_scores() #DONE 
@@ -25,12 +25,14 @@
     * build_sparse_matrix() #DONE
     * train_als_model() #DONE
     * get_job_recommendations_for_single_user() #DONE
-    * get_job_recommendations_for_bulk_users()
-    * find_similar_jobs()
+    * get_job_recommendations_for_bulk_users() #DONE
+    * find_similar_jobs() #DONE
 * Build http endpoints:
-    * recommender/retrain_model
+    * recommender/retrain_model #DONE
     * recommender/recommend
     * recommender/recommend_bulk
+* Generate requirements.txt
+
 
 ### Employer Clustering
 * Build lists of `job.description` per `job.employer`.
@@ -57,13 +59,15 @@
     * Will reduce coupling of `Recommender` class.
     * `Recommender` class consumes and `ActivityDTO`.
     * Will make testing `Recommender` easier by mocking `ActivityDTO` with a small fixture.
-* Create bespoke class for list of user_job_triples used to create scored matrix for recommendation model.
 * To avoid iterating twice over all `user_id` and `job_id` keys, `generate_user_job_triples` and `add_implicit_scores` can be refactored into single method if `activities` data becomes significantly large. It'll create come coupling between scoring and generating the scored data, but shouldn't cause much overhead or complexity.
 * For further efficiencies and code performance, `get_unique_entities` can also be refactored into `generate_user_job_triples` and `add_implicit_scores`. However, this single method would now be having many "side effects".
 * Filter job recommendations that are old or no longer available.
 * Apply a moving window to activities' data used to train the recommender model, so as to adapt to a user's changing job preferences or expectations across time. 
 * Add `users.jsonl` and `activities.jsonl` data to a NoSQL database to retrieve user demographics and job descriptions for enhancing recommendations metadata.
 * Create bespoke exceptions and handle incorrect arguments passed to endpoints.
+* Create bespoke class for list of user_job_triples used to create scored matrix for recommendation model.
+* Create bespoke class for single user recommendations response object.
+* Create bespoke class for batch user recommendations response object.
 
 
 ## Assumptions
