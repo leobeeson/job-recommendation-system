@@ -5,6 +5,7 @@ from enum import Enum
 import json
 
 
+
 class Recommender:
 
     user_id_key: str = "user_id"
@@ -28,6 +29,21 @@ class Recommender:
                 except TypeError:
                     self.activities[user_id][job_id][activity_type] = 1      
 
+    @staticmethod
+    def calculate_implicit_score(impressions: int, redirects: int) -> int:    
+        impressions = impressions if impressions is not None else 0
+        redirects = redirects if redirects is not None else 0
+        clipped_impressions = 10 if impressions > 10 else impressions
+        clipped_redirects = 10 if redirects > 10 else redirects
+        scaled_redirects = clipped_redirects * 2
+        overexposure_penalty = 0 if clipped_impressions - clipped_redirects < 0 else clipped_impressions - clipped_redirects
+        score = scaled_redirects + clipped_impressions - overexposure_penalty
+        if score < 2 and redirects > 0:
+            score = 2
+        if score < 1 and impressions > 0:
+            score = 1
+        return score
+
 
 class Activity(Enum):
     IMPRESSION = 1
@@ -35,6 +51,10 @@ class Activity(Enum):
 
 
 if __name__ == "__main__":
+  
     recommender = Recommender("dataset/activities.jsonl")
-    recommender.activities
+    recommender.calculate_implicit_score(5, 3)
+    
+
+
 
