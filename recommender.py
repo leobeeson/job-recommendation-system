@@ -133,9 +133,9 @@ class Recommender:
                 N=number_of_recommendations, 
                 filter_already_liked_items=False
             )
-            for job_id, score in zip(ids, scores):
+            for job_idx, score in zip(ids, scores):
                 recommendation = {
-                    Recommender.job_id_key: self.matrix_column_job_index[job_id],
+                    Recommender.job_id_key: self.matrix_column_job_index[job_idx],
                     Recommender.recommendation_score_key: score 
                     }
                 response.append(recommendation)
@@ -155,13 +155,27 @@ class Recommender:
             
             for user_id, job_ids, scores in zip(user_ids_verified, ids, scores):
                 user_response = []
-                for job_id, score in zip(job_ids, scores):
+                for job_idx, score in zip(job_ids, scores):
                     recommendation = {
-                        Recommender.job_id_key: self.matrix_column_job_index[job_id],
+                        Recommender.job_id_key: self.matrix_column_job_index[job_idx],
                         Recommender.recommendation_score_key: score 
                         }
                     user_response.append(recommendation)    
                 response[user_id] = user_response
+        return response
+
+    def find_similar_jobs(self, job_id: int) -> list[dict]:
+        response = []
+        if isinstance(job_id, int) and job_id in self.entity_indices["unique_jobs"]:
+            job_idx = self.matrix_column_job_index.get_loc(job_id)
+            similar_jobs_idx, scores = self.als_model.similar_items(job_idx)
+            # similar_jobs_ids = [self.matrix_column_job_index[idx] for idx in similar_jobs_idx]
+            for job_idx, score in zip(similar_jobs_idx, scores):
+                recommendation = {
+                    Recommender.job_id_key: self.matrix_column_job_index[job_idx],
+                    Recommender.recommendation_score_key: score 
+                    }
+                response.append(recommendation)
         return response
 
 
@@ -182,4 +196,6 @@ if __name__ == "__main__":
     recommender.train_als_model()
     response = recommender.get_job_recommendations_for_single_user(99955)
     response = recommender.get_job_recommendations_for_bulk_users([99955, 65794, 31004]) 
+    response = recommender.find_similar_jobs(23274)
 
+    
