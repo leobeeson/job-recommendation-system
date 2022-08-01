@@ -1,4 +1,44 @@
+## Assumptions
 
+### Funnel
+* A good funnel is: `(a impression -> a redirect) * n`
+    * User checked out the same job at the employer multiple times, always starting from Bright.
+    * The larger `n`, probably the more relevant the job for the user (strong assumption).
+    * If `n == 1`, maybe the user did not like the job after looking at it in from the employer's site (weak assumption).
+* An efficient funnel is: `(a impression -> b redirect) * n` where a < b
+    * User might have bookmarked employers job page.
+* An inefficient funnel is: `(a impression -> b redirect) * n` where a > b
+    * User might have missed the impression several times.
+    * User was not initially attracted to the job (last resort).
+    * User applied to the job, but impressions kept being shown to him/her in subsequent searches.
+* A bad funnel is: `(1 impression -> 0 redirect) * n`
+    * User is not finding anything attractive.
+    * User is being engaged at the wrong moment (e.g. doesn't have time to redirect and dive deeper).
+* A strange funnel is: `(0 impression -> 1 redirect) * n`
+    * 813 users redirected to a specific job without having a tracked impression.
+    * 22 jobs had redirections without having tracked impressions.
+
+### Scaling Implicit Feedback
+* `max(impression) == 10`
+* `max(redirect) == 10`
+* `scaled_redirect = redirect * 2`
+* `overexposure_penalty = impressions - redirects` where `0 < impressions - redirects`
+* `implicit_score = scaled_redirect + impression - (impression - redirect)`
+* `min(implicit_score) == 2` where `redirect > 0`
+* `min(implicit_score) == 1` where `redirect == 0 & impression > 0`
+
+## Data Model for Scored Activities Data
+```python
+{
+    user_id:int: {
+        job_id:int {
+            impression:str : count:int,
+            redirect:str: count:int,
+            implicit_score:int score:func(redirect*2 impression - (impression - redirect))
+        }
+    }
+}
+```
 
 ## Work Breakdown Structure
 
@@ -27,26 +67,25 @@
     * get_job_recommendations_for_single_user() #DONE
     * get_job_recommendations_for_bulk_users() #DONE
     * find_similar_jobs() #DONE
-* Build http endpoints:
-    * recommender/retrain_model #DONE
-    * recommender/recommend
-    * recommender/recommend_bulk
-* Generate requirements.txt
-
+* Build http endpoints: #DONE
+    * recommender/jobs_single_user #DONE
+    * recommender/jobs_multiple_users #DONE
+    * recommender/find_similar_jobs #DONE
+* Generate requirements.txt #DONE
 
 ### Employer Clustering
-* Build lists of `job.description` per `job.employer`.
-* Build corpus from lists of `job.description`.
-* Train MWE model on corpus.
-* Identify valuable MWE.
-* Identify valuable unigrams.
-* Reduce corpus vocabulary to selected unigrams and MWE.
+* Build lists of `job.description` per `job.employer`. #TODO
+* Build corpus from lists of `job.description`. #TODO
+* Train MWE model on corpus. #TODO
+* Identify valuable MWE. #TODO
+* Identify valuable unigrams. #TODO
+* Reduce corpus vocabulary to selected unigrams and MWE. #TODO
 
 #### K-Means Clustering: Types of Employers
-* sklearn.cluster.KMeans
+* sklearn.cluster.KMeans #TODO
 
 #### Employer Similarities
-* gensim.models.doc2vec
+* gensim.models.doc2vec #TODO
 
 
 ## Out of Scope / Future Work
@@ -68,52 +107,16 @@
 * Create bespoke class for list of user_job_triples used to create scored matrix for recommendation model.
 * Create bespoke class for single user recommendations response object.
 * Create bespoke class for batch user recommendations response object.
+* Create endpoint for retraining recommender model with new/larger data: `recommender/retrain_model`. 
 
 
-## Assumptions
+## Future Ideas
 
-### Funnel
-* A good funnel is: `(a impression -> a redirect) * n`
-    * User checked out the same job at the employer multiple times, always starting from Bright.
-    * The larger `n`, probably the more relevant the job for the user (strong assumption).
-    * If `n == 1`, maybe the user did not like the job after looking at it in from the employer's site (weak assumption).
-* An efficient funnel is: `(a impression -> b redirect) * n` where a < b
-    * User might have bookmarked employers job page.
-* An inefficient funnel is: `(a impression -> b redirect) * n` where a > b
-    * User might have missed the impression several times.
-    * User was not initially attracted to the job (last resort).
-    * User applied to the job, but impressions kept being shown to him/her in subsequent searches.
-* A bad funnel is: `(1 impression -> 0 redirect) * n`
-    * User is not finding anything attractive.
-    * User is being engaged at the wrong moment (e.g. doesn't have time to redirect and dive deeper).
-* A strange funnel is: `(0 impression -> 1 redirect) * n`
-    * 813 users redirected to a specific job without having a tracked impression.
-    * 22 jobs had redirections without having tracked impressions.
+### Enhanced Input Data
+* Incorporate data that flags when a user has applied to a job after being redirected to an employer's page, so we can recommend only jobs to which he/she hasn't applied to.
+* It would be interesting to have data on users that don't open an email (from Bright), and those who do open the email but don't click through to Bright's website.
 
-### Scaling
-* `max(impression) == 10`
-* `max(redirect) == 10`
-* `scaled_redirect == redirect * 2`
-* `implicit_score == scaled_redirect + impression - (impression - redirect)`
-* `min(implicit_score) == 2 where redirect > 0`
-* `min(implicit_score) == 1 where redirect == 0 & impression > 0`
-
-
-## Data Models
-
-```python
-{
-    user_id:int: {
-        job_id:int {
-            impression:str : count:int,
-            redirect:str: count:int,
-            implicit_score:int score:func(redirect*2 impression - (impression - redirect))
-        }
-    }
-}
-```
-
-## Questions
+### Questions
 * How many impressions per user per unit of time?
 * How many redirects per user per unit of time?
 * How frequently do users use Bright?
@@ -121,13 +124,10 @@
     * Do most users use it multiple times during a condensed period of time? (i.e. while job hunting)
     * Can users return to bright after a couple months/years of work experience?
 
-
-## Future Ideas
-* Incorporate data that flags when a user has applied to a job after being redirected to an employer's page, so we can recommend only jobs to which he/she hasn't applied to.
-* It would be interesting to have data on users that don't open an email (from Bright), and those who do open the email but don't click through to Bright's website.
-
-## Research
+### Research
 * Why is AlternatingLeastSquares recommended for implicit feedback?
+    * Good initial [source](https://towardsdatascience.com/prototyping-a-recommender-system-step-by-step-part-2-alternating-least-square-als-matrix-4a76c58714a1).
+* What other models are also recommended for implicit feedback recommender systems?
 
 ## Commands
 Start the application:
@@ -203,3 +203,41 @@ Response:
     ]
 }
 ```
+
+Request similar jobs recommendations from a single job:
+```bash
+curl -X POST http://127.0.0.1:8000/recommend/find_similar_jobs/ -H "Content-Type: application/json" -d '{"job_id": 23274}'
+```
+Response:
+```json
+{
+    "job_id":23274,
+    "jobs":[
+        {"job_id":23274,"score":1.0},
+        {"job_id":22294,"score":0.9260625243186951},
+        {"job_id":16813,"score":0.9248543381690979},
+        {"job_id":26946,"score":0.9047039151191711},
+        {"job_id":23896,"score":0.9032652378082275},
+        {"job_id":23739,"score":0.8922211527824402},
+        {"job_id":28587,"score":0.8813559412956238},
+        {"job_id":28599,"score":0.8813554048538208},
+        {"job_id":28596,"score":0.8813521862030029},
+        {"job_id":28595,"score":0.8813501596450806}
+    ]
+}
+```
+
+
+<style>
+todo { background-color: Yellow; color: SteelBlue }
+recurrent { background-color: Gold; color: SteelBlue }
+refactor { background-color: SpringGreen; color: DarkGreen }
+done { background-color: Green; color: PaleGreen }
+test { background-color: Coral; color: DarkRed }
+fixme { background-color: Crimson; color: white }
+focus { background-color: DeepSkyBlue; color: MediumBlue }
+reqspec { background-color: MediumPurple; color: Indigo }
+doubt { background-color: #FF00FF; color: Yellow }
+wait { background-color: Pink; color: Crimson }
+blocked { background-color: Crimson; color: Yellow }
+</style>
