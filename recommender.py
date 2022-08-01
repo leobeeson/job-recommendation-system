@@ -172,8 +172,8 @@ class Recommender:
             similar_jobs_idx, scores = self.als_model.similar_items(job_idx)
             for job_idx, score in zip(similar_jobs_idx, scores):
                 recommendation = {
-                    Recommender.job_id_key: self.matrix_column_job_index[job_idx],
-                    Recommender.recommendation_score_key: score 
+                    Recommender.job_id_key: self.matrix_column_job_index[job_idx].item(),
+                    Recommender.recommendation_score_key: score.item()
                     }
                 response.append(recommendation)
         return response

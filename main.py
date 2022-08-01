@@ -33,5 +33,12 @@ def recommend_jobs_bulk_users(users: Users):
     multi_user_job_recommendations = response
     return multi_user_job_recommendations
 
+@app.post("/recommend/find_similar_jobs/") 
+def recommend_similar_jobs(job: Job):
+    response = recommender.find_similar_jobs(job.job_id)
+    similar_job_recommendations = {"job_id": job.job_id, "jobs": response}
+    return similar_job_recommendations
+
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
