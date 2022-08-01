@@ -3,9 +3,11 @@ from utils.utils import nested_default_dict
 from enum import Enum
 
 import json
+import time
 import numpy
 import pandas
 import scipy
+from implicit.als import AlternatingLeastSquares
 
 
 class Recommender:
@@ -14,6 +16,7 @@ class Recommender:
     job_id_key: str = "job_id"
     activity_type_key:str = "type"
     implicit_score_key: str = "implicit_score"
+    recommendation_score_key: str = "score"
     
     def __init__(self, activities_filepath) -> None:
         self.activities_filepath = activities_filepath
@@ -112,6 +115,55 @@ class Recommender:
         matrix_implicit_scores = user_job_implicit_scores_df.to_numpy()
         self.matrix_csr = scipy.sparse.csr_matrix(matrix_implicit_scores)
 
+    def train_als_model(self) -> None:
+        als_model = AlternatingLeastSquares(factors=64, regularization=0.05)
+        t0 = time.time()
+        als_model.fit(2 * self.matrix_csr)
+        t1 = time.time()
+        print(f"Model training duration (seconds): {t1 - t0}") 
+        self.als_model = als_model
+
+    def get_job_recommendations_for_single_user(self, user_id: int, number_of_recommendations: int = 10) -> list[dict]:
+        response = []
+        if isinstance(user_id, int) and user_id in self.entity_indices["unique_users"]:
+            user_matrix_row_idx = self.matrix_row_user_index.get_loc(user_id)
+            ids, scores = self.als_model.recommend(
+                user_matrix_row_idx, 
+                self.matrix_csr[user_matrix_row_idx], 
+                N=number_of_recommendations, 
+                filter_already_liked_items=False
+            )
+            for job_id, score in zip(ids, scores):
+                recommendation = {
+                    Recommender.job_id_key: self.matrix_column_job_index[job_id],
+                    Recommender.recommendation_score_key: score 
+                    }
+                response.append(recommendation)
+        return response
+
+    def get_job_recommendations_for_bulk_users(self, user_ids: list[int], number_of_recommendations: int = 10) -> dict:
+        response = {}
+        if isinstance(user_ids, list) and all(isinstance(x, int) for x in user_ids):
+            user_ids_verified = [user_id for user_id in user_ids if user_id in self.entity_indices["unique_users"]]
+            user_matrix_row_idx = [self.matrix_row_user_index.get_loc(user_id) for user_id in user_ids_verified]
+            ids, scores = self.als_model.recommend(
+                user_matrix_row_idx, 
+                self.matrix_csr[user_matrix_row_idx], 
+                N=number_of_recommendations, 
+                filter_already_liked_items=False
+            )
+            
+            for user_id, job_ids, scores in zip(user_ids_verified, ids, scores):
+                user_response = []
+                for job_id, score in zip(job_ids, scores):
+                    recommendation = {
+                        Recommender.job_id_key: self.matrix_column_job_index[job_id],
+                        Recommender.recommendation_score_key: score 
+                        }
+                    user_response.append(recommendation)    
+                response[user_id] = user_response
+        return response
+
 
 class Activity(Enum):
     IMPRESSION = 1
@@ -120,22 +172,14 @@ class Activity(Enum):
 
 if __name__ == "__main__":
     recommender = Recommender("dataset/activities.jsonl")
-    
-    recommender.calculate_implicit_score(5, 3)
-    
+    recommender.calculate_implicit_score(5, 3)    
     recommender.activities[65794][20116].get(Recommender.implicit_score_key) # 1
-    
     recommender.user_job_implicit_scores[0]
-
     recommender.entity_indices["unique_users"][0:10]
     recommender.entity_indices["unique_jobs"][0:10]
-
     recommender.build_sparse_matrix()
     recommender.matrix_csr.shape
-    
-
-    
-    
-
-
+    recommender.train_als_model()
+    response = recommender.get_job_recommendations_for_single_user(99955)
+    response = recommender.get_job_recommendations_for_bulk_users([99955, 65794, 31004]) 
 
