@@ -26,6 +26,10 @@
     * train_als_model()
     * get_recommendations_single()
     * get_recommendations_bulk()
+* Build http endpoints:
+    * recommender/retrain_model
+    * recommender/recommend
+    * recommender/recommend_bulk
 
 ### Employer Clustering
 * Build lists of `job.description` per `job.employer`.
