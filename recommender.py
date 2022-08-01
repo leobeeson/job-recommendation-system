@@ -117,6 +117,7 @@ class Recommender:
 
     def train_als_model(self) -> None:
         als_model = AlternatingLeastSquares(factors=64, regularization=0.05)
+        print("Start recommender model training. Should take ~ 15 seconds.")
         t0 = time.time()
         als_model.fit(2 * self.matrix_csr)
         t1 = time.time()
@@ -135,8 +136,8 @@ class Recommender:
             )
             for job_idx, score in zip(ids, scores):
                 recommendation = {
-                    Recommender.job_id_key: self.matrix_column_job_index[job_idx],
-                    Recommender.recommendation_score_key: score 
+                    Recommender.job_id_key: self.matrix_column_job_index[job_idx].item(),
+                    Recommender.recommendation_score_key: score.item() 
                     }
                 response.append(recommendation)
         return response
@@ -169,7 +170,6 @@ class Recommender:
         if isinstance(job_id, int) and job_id in self.entity_indices["unique_jobs"]:
             job_idx = self.matrix_column_job_index.get_loc(job_id)
             similar_jobs_idx, scores = self.als_model.similar_items(job_idx)
-            # similar_jobs_ids = [self.matrix_column_job_index[idx] for idx in similar_jobs_idx]
             for job_idx, score in zip(similar_jobs_idx, scores):
                 recommendation = {
                     Recommender.job_id_key: self.matrix_column_job_index[job_idx],
