@@ -128,3 +128,78 @@
 
 ## Research
 * Why is AlternatingLeastSquares recommended for implicit feedback?
+
+## Commands
+Start the application:
+```bash
+uvicorn main:app --reload
+```
+
+Request job recommendations for a single user:
+```bash
+curl -X POST http://127.0.0.1:8000/recommend/jobs_single_user/ -H "Content-Type: application/json" -d '{"user_id": 99955}'
+```
+Response:
+```json
+{
+    "user_id":99955,
+    "jobs":[
+        {"job_id":28391,"score":0.6198304891586304},
+        {"job_id":16818,"score":0.5988735556602478},
+        {"job_id":14709,"score":0.5657774806022644},
+        {"job_id":16723,"score":0.4660928547382355},
+        {"job_id":23274,"score":0.3648761510848999},
+        {"job_id":20517,"score":0.3629113435745239},
+        {"job_id":26481,"score":0.3579047620296478},
+        {"job_id":20105,"score":0.35438770055770874},
+        {"job_id":28504,"score":0.3502712845802307},
+        {"job_id":14386,"score":0.34550684690475464}
+    ]
+}
+```
+
+Request job recommendations for a multiple users:
+```bash
+curl -X POST http://127.0.0.1:8000/recommend/jobs_multiple_users/ -H "Content-Type: application/json" -d '{"user_ids": [99955, 65794, 31004]}'
+```
+Response:
+```json
+{
+    "99955":[
+        {"job_id":28391,"score":0.6198304891586304},
+        {"job_id":16818,"score":0.598873496055603},
+        {"job_id":14709,"score":0.5657775402069092},
+        {"job_id":16723,"score":0.46609288454055786},
+        {"job_id":23274,"score":0.36487603187561035},
+        {"job_id":20517,"score":0.3629113435745239},
+        {"job_id":26481,"score":0.3579047620296478},
+        {"job_id":20105,"score":0.35438767075538635},
+        {"job_id":28504,"score":0.35027122497558594},
+        {"job_id":14386,"score":0.34550684690475464}
+    ],
+    "65794":[
+        {"job_id":3950,"score":1.3044391870498657},
+        {"job_id":15219,"score":1.196151614189148},
+        {"job_id":16588,"score":1.0560941696166992},
+        {"job_id":15062,"score":0.8263643980026245},
+        {"job_id":15675,"score":0.818429172039032},
+        {"job_id":8078,"score":0.814281702041626},
+        {"job_id":14829,"score":0.8116833567619324},
+        {"job_id":15218,"score":0.7878887057304382},
+        {"job_id":20116,"score":0.7703413963317871},
+        {"job_id":14710,"score":0.7347549200057983}
+    ],
+    "31004":[
+        {"job_id":15030,"score":1.0643808841705322},
+        {"job_id":14712,"score":0.7925517559051514},
+        {"job_id":12969,"score":0.7763451337814331},
+        {"job_id":12057,"score":0.7574162483215332},
+        {"job_id":13576,"score":0.6788557171821594},
+        {"job_id":12068,"score":0.6747690439224243},
+        {"job_id":14191,"score":0.6514241099357605},
+        {"job_id":15045,"score":0.6504997611045837},
+        {"job_id":13721,"score":0.6069185137748718},
+        {"job_id":16772,"score":0.5923895239830017}
+    ]
+}
+```
