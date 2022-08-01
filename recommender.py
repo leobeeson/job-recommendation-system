@@ -11,6 +11,7 @@ class Recommender:
     user_id_key: str = "user_id"
     job_id_key: str = "job_id"
     activity_type_key:str = "type"
+    implicit_score_key: str = "implicit_score"
     
     def __init__(self, activities_filepath) -> None:
         self.activities_filepath = activities_filepath
@@ -28,6 +29,14 @@ class Recommender:
                     self.activities[user_id][job_id][activity_type] = self.activities[user_id][job_id][activity_type] + 1
                 except TypeError:
                     self.activities[user_id][job_id][activity_type] = 1      
+
+    def add_implicit_scores(self) -> None:
+        for user_id in self.activities.keys():
+            for job_id in self.activities[user_id].keys():
+                impression = self.activities[user_id][job_id].get(Activity.IMPRESSION.name.lower())
+                redirect = self.activities[user_id][job_id].get(Activity.REDIRECT.name.lower())
+                implicit_score = Recommender.calculate_implicit_score(impression, redirect)
+                self.activities[user_id][job_id][self.implicit_score_key] = implicit_score
 
     @staticmethod
     def calculate_implicit_score(impressions: int, redirects: int) -> int:    
@@ -51,9 +60,17 @@ class Activity(Enum):
 
 
 if __name__ == "__main__":
-  
     recommender = Recommender("dataset/activities.jsonl")
+    
     recommender.calculate_implicit_score(5, 3)
+    
+    recommender.add_implicit_scores()
+    recommender.activities[65794][20116].get(Recommender.implicit_score_key) # 1
+    
+
+    
+
+    
     
 
 
