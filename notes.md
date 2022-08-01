@@ -16,8 +16,8 @@
 * Create ALS model. #DONE
 * Fit ALS model. #DONE
 * Refactor code into `Recommender` class: #FOCUS
-    * read_activity_data()
-    * calculate_implicit_score()
+    * read_activity_data() #DONE
+    * calculate_implicit_score() 
     * add_implicit_scores()
     * generate_user_job_triples()
     * get_unique_engaged_users()
@@ -44,6 +44,15 @@
 
 #### Employer Similarities
 * gensim.models.doc2vec
+
+## Out of Scope / Future Work
+* Apply code formatting guidelines/framework.
+
+### Recommender
+* Move reading activity data into its own DTO class `ActivityDTO`.
+    * Will reduce coupling of `Recommender` class.
+    * `Recommender` class consumes and `ActivityDTO`.
+    * Will make testing `Recommender` easier by mocking `ActivityDTO` with a small fixture.
 
 
 ## Assumptions
