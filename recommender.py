@@ -158,8 +158,8 @@ class Recommender:
                 user_response = []
                 for job_idx, score in zip(job_ids, scores):
                     recommendation = {
-                        Recommender.job_id_key: self.matrix_column_job_index[job_idx],
-                        Recommender.recommendation_score_key: score 
+                        Recommender.job_id_key: self.matrix_column_job_index[job_idx].item(),
+                        Recommender.recommendation_score_key: score.item() 
                         }
                     user_response.append(recommendation)    
                 response[user_id] = user_response
