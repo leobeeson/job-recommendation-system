@@ -9,7 +9,7 @@ from recommender import Recommender
 @pytest.fixture(scope='module', autouse=True)
 def activities_dto():
     recommender = Recommender("tests/test_data/test_activities.jsonl")
-    # recommender.add_implicit_scores()
+    recommender.build_sparse_matrix()
     return recommender
 
 @pytest.fixture()
@@ -107,3 +107,11 @@ def test_implicit_scores_are_retrieved_from_activities_data_properly(activities_
 def test_unique_entities_are_identified_properly(activities_dto, expected_unique_entities) -> None:
     entity_indices = activities_dto.entity_indices
     assert entity_indices == expected_unique_entities
+
+# Test csr matrix has correct dimensions:
+def test_csr_matrix_has_correct_dimensions(activities_dto, expected_unique_entities) -> None:
+    rows_dim = len(expected_unique_entities["unique_users"])
+    columns_dim = len(expected_unique_entities["unique_jobs"])
+    expected_matrix_shape = (rows_dim, columns_dim)
+    csr_matrix_shape = activities_dto.matrix_csr.shape
+    assert csr_matrix_shape == expected_matrix_shape
