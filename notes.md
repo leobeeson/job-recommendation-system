@@ -17,11 +17,11 @@
 * Fit ALS model. #DONE
 * Refactor code into `Recommender` class: #FOCUS
     * read_activity_data() #DONE
-    * calculate_implicit_score() 
-    * add_implicit_scores()
-    * generate_user_job_triples()
-    * get_unique_engaged_users()
-    * get_unique_engaged_jobs()
+    * calculate_implicit_score() #DONE
+    * add_implicit_scores() #DONE 
+    * generate_user_job_triples() #DONE
+    * get_unique_engaged_users() #DONE
+    * get_unique_engaged_jobs() #DONE
     * build_sparse_matrix()
     * train_als_model()
     * get_recommendations_single()
@@ -45,7 +45,10 @@
 #### Employer Similarities
 * gensim.models.doc2vec
 
+
 ## Out of Scope / Future Work
+
+### General
 * Apply code formatting guidelines/framework.
 
 ### Recommender
@@ -53,6 +56,8 @@
     * Will reduce coupling of `Recommender` class.
     * `Recommender` class consumes and `ActivityDTO`.
     * Will make testing `Recommender` easier by mocking `ActivityDTO` with a small fixture.
+* Create bespoke class for list of user_job_triples used to create scored matrix for recommendation model.
+* To avoid iterating twice over all `user_id` and `job_id` keys, `generate_user_job_triples` and `add_implicit_scores` can be refactored into single method if `activities` data becomes significantly large. It'll create come coupling between scoring and generating the scored data, but shouldn't cause much overhead or complexity.
 
 
 ## Assumptions

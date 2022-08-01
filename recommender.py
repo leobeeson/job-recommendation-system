@@ -17,6 +17,9 @@ class Recommender:
         self.activities_filepath = activities_filepath
         self.activities = nested_default_dict()
         self.read_activity_data()
+        self.add_implicit_scores()
+        self.generate_user_job_triples()
+        self.get_unique_entities()
 
     def read_activity_data(self) -> None:
         with open(self.activities_filepath) as input_file:
@@ -53,6 +56,38 @@ class Recommender:
             score = 1
         return score
 
+    def generate_user_job_triples(self) -> None:
+        user_job_implicit_scores = []
+        for user_id in self.activities.keys():
+            for job_id in self.activities[user_id].keys():
+                implicit_score = self.activities[user_id][job_id].get(self.implicit_score_key)
+                if implicit_score:
+                    user_job_triple = Recommender.generate_user_job_triple(user_id, job_id, implicit_score)
+                    user_job_implicit_scores.append(user_job_triple)
+        self.user_job_implicit_scores = user_job_implicit_scores
+
+    @classmethod
+    def generate_user_job_triple(cls, user_id, job_id, implicit_score) -> dict:
+        user_job_triple = {
+                            cls.user_id_key: user_id, 
+                            cls.job_id_key: job_id, 
+                            cls.implicit_score_key: implicit_score
+                        }
+        return user_job_triple
+
+    def get_unique_entities(self) -> None:
+        unique_user_ids = set()
+        unique_job_ids = set()
+        for triple in self.user_job_implicit_scores:
+            unique_user_ids.add(triple[self.user_id_key])
+            unique_job_ids.add(triple[self.job_id_key])
+        unique_user_ids = list(unique_user_ids)
+        unique_user_ids.sort()
+        unique_job_ids = list(unique_job_ids)
+        unique_job_ids.sort()
+        entity_indices = {"unique_users": unique_user_ids, "unique_jobs": unique_job_ids}
+        self.entity_indices = entity_indices
+
 
 class Activity(Enum):
     IMPRESSION = 1
@@ -64,10 +99,12 @@ if __name__ == "__main__":
     
     recommender.calculate_implicit_score(5, 3)
     
-    recommender.add_implicit_scores()
     recommender.activities[65794][20116].get(Recommender.implicit_score_key) # 1
     
+    recommender.user_job_implicit_scores[0]
 
+    recommender.entity_indices["unique_users"][0:10]
+    recommender.entity_indices["unique_jobs"][0:10]
     
 
     

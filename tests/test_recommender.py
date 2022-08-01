@@ -3,11 +3,30 @@ import pytest
 from recommender import Recommender
 
 
+
+
+
 @pytest.fixture(scope='module', autouse=True)
 def activities_dto():
-    recommender = Recommender("dataset/activities.jsonl")
-    recommender.add_implicit_scores()
+    recommender = Recommender("tests/test_data/test_activities.jsonl")
+    # recommender.add_implicit_scores()
     return recommender
+
+@pytest.fixture()
+def expected_user_job_triples():
+    user_job_triples_dummy_data = [
+        {'user_id': 65794, 'job_id': 16588, 'implicit_score': 3},
+        {'user_id': 31004, 'job_id': 20515, 'implicit_score': 1}
+    ]
+    return user_job_triples_dummy_data
+    
+@pytest.fixture()
+def expected_unique_entities():
+    entity_indices = {
+        "unique_users": [31004, 65794],
+        "unique_jobs": [16588, 20515]
+    }
+    return entity_indices
 
 
 # Test no redirects:
@@ -80,17 +99,11 @@ def test_excessive_redirects_are_clipped(impressions, redirects, expected_score)
     assert implicit_score == expected_score
 
 # Test implicit scores setting:
-test_data_implicit_scores_set = [
-    (65794, 20116, 1),
-    (65794, 15675, 1),
-    (65794, 14884, 6),
-    (65794, 16588, 3),
-    (31004, 20515, 1),
-    (31004, 20022, 1),
-    (31004, 16718, 3),
-    (31004, 25427, 3)
-    ]
-@pytest.mark.parametrize("user_id, job_id, expected_score", test_data_implicit_scores_set)
-def test_implicit_scores_are_retrieved_from_activities_data_properly(activities_dto, user_id, job_id, expected_score) -> None:
-    implicit_score = activities_dto.activities[user_id][job_id].get(Recommender.implicit_score_key)
-    assert implicit_score == expected_score
+def test_implicit_scores_are_retrieved_from_activities_data_properly(activities_dto, expected_user_job_triples) -> None:
+    user_job_implicit_scores = activities_dto.user_job_implicit_scores
+    assert user_job_implicit_scores == expected_user_job_triples
+
+# Test implicit scores setting:
+def test_unique_entities_are_identified_properly(activities_dto, expected_unique_entities) -> None:
+    entity_indices = activities_dto.entity_indices
+    assert entity_indices == expected_unique_entities
