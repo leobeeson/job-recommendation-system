@@ -9,13 +9,13 @@ The project is primarily contained in two components: a `Recommender` class, and
 The project `Recommender` class executes the following processes:  
 1. Ingesting and transforming the user-job interaction data.
 2. Estimating an implicit score for user-job interactions.
-3. Generating sparse matrix with implicitly scored user-job interactions.
-4. Training a recommendation model based on Alternating Least Squares matrix factorization algorithm.
+3. Generating a sparse matrix with implicitly scored user-job interactions.
+4. Training a recommendation model based on an Alternating Least Squares matrix factorization algorithm.
 5. Generate job recommendations for a single user.
 6. Generate job recommendations for a batch of users.
 7. Find similar jobs to a given job.
 
-The `main.py` file serves the FastAPI exposing the following endpoints:
+The `main.py` file serves the FastAPI interface exposing the following endpoints:
 * `/recommend/jobs_single_user/`: POST endpoint consuming a payload of `{user_id: int}`
 * `/recommend/jobs_multiple_users/`: POST endpoint consuming a payload of `{user_ids: list[int]}`
 * `/recommend/find_similar_jobs/`: POST endpoint consuming a payload of `{job_id: int}`
@@ -24,7 +24,7 @@ The `main.py` file serves the FastAPI exposing the following endpoints:
 1. Clone repo:
     ```bash
     git clone https://github.com/leobeeson/job-recommendation-system.git 
-    ```bash
+    ```
 2. Create virtual environment: 
     ```bash
     python -m venv. venv
@@ -177,7 +177,7 @@ Response:
 }
 ```
 
-## Scaling and Scoring Implicit Feedback
+## Assumptions
 ### Conversion Funnel
 * A good funnel is: `(a impression -> a redirect) * n`
     * User checked out the same job at the employer multiple times, always starting from work network's website.
@@ -196,7 +196,7 @@ Response:
     * 813 users redirected to a specific job without having a tracked impression.
     * 22 jobs had redirections without having tracked impressions.
 
-### Scaling Implicit Feedback
+### Scoring Implicit Feedback
 * `max(impression) == 10`
 * `max(redirect) == 10`
 * `scaled_redirect = redirect * 2`
@@ -224,7 +224,7 @@ Response:
 ### Employer Clustering:
 * Build lists of `job.description` per `job.employer`. #TODO
 * Build corpus from lists of `job.description`. #TODO
-* Train MWE model on corpus using `gensim.models.phrases`. #TODO
+* Train Multi-Word Expressions (MWE) model on corpus using `gensim.models.phrases`. #TODO
 * Identify valuable MWE. #TODO
 * Identify valuable unigrams. #TODO
 * Reduce corpus vocabulary to selected unigrams and MWE. #TODO
