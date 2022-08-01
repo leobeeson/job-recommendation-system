@@ -22,10 +22,11 @@
     * generate_user_job_triples() #DONE
     * get_unique_engaged_users() #DONE
     * get_unique_engaged_jobs() #DONE
-    * build_sparse_matrix() 
-    * train_als_model()
-    * get_recommendations_single()
-    * get_recommendations_bulk()
+    * build_sparse_matrix() #DONE
+    * train_als_model() #DONE
+    * get_job_recommendations_for_single_user() #DONE
+    * get_job_recommendations_for_bulk_users()
+    * find_similar_jobs()
 * Build http endpoints:
     * recommender/retrain_model
     * recommender/recommend
@@ -59,6 +60,10 @@
 * Create bespoke class for list of user_job_triples used to create scored matrix for recommendation model.
 * To avoid iterating twice over all `user_id` and `job_id` keys, `generate_user_job_triples` and `add_implicit_scores` can be refactored into single method if `activities` data becomes significantly large. It'll create come coupling between scoring and generating the scored data, but shouldn't cause much overhead or complexity.
 * For further efficiencies and code performance, `get_unique_entities` can also be refactored into `generate_user_job_triples` and `add_implicit_scores`. However, this single method would now be having many "side effects".
+* Filter job recommendations that are old or no longer available.
+* Apply a moving window to activities' data used to train the recommender model, so as to adapt to a user's changing job preferences or expectations across time. 
+* Add `users.jsonl` and `activities.jsonl` data to a NoSQL database to retrieve user demographics and job descriptions for enhancing recommendations metadata.
+* Create bespoke exceptions and handle incorrect arguments passed to endpoints.
 
 
 ## Assumptions
@@ -112,9 +117,10 @@
     * Do most users use it multiple times during a condensed period of time? (i.e. while job hunting)
     * Can users return to bright after a couple months/years of work experience?
 
-## Research
-* Why is AlternatingLeastSquares recommended for implicit feedback?
-
 
 ## Future Ideas
+* Incorporate data that flags when a user has applied to a job after being redirected to an employer's page, so we can recommend only jobs to which he/she hasn't applied to.
 * It would be interesting to have data on users that don't open an email (from Bright), and those who do open the email but don't click through to Bright's website.
+
+## Research
+* Why is AlternatingLeastSquares recommended for implicit feedback?
