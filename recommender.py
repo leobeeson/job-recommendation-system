@@ -18,7 +18,7 @@ class Recommender:
     implicit_score_key: str = "implicit_score"
     recommendation_score_key: str = "score"
     
-    def __init__(self, activities_filepath) -> None:
+    def __init__(self, activities_filepath: str) -> None:
         self.activities_filepath = activities_filepath
         self.activities = nested_default_dict()
         self.read_activity_data()
@@ -72,7 +72,7 @@ class Recommender:
         self.user_job_implicit_scores = user_job_implicit_scores
 
     @classmethod
-    def generate_user_job_triple(cls, user_id, job_id, implicit_score) -> dict:
+    def generate_user_job_triple(cls, user_id: int, job_id: int, implicit_score: int) -> dict:
         user_job_triple = {
                             cls.user_id_key: user_id, 
                             cls.job_id_key: job_id, 
