@@ -74,8 +74,15 @@
 * Generate requirements.txt #DONE
 
 ### Employer Clustering
-* Build lists of `job.description` per `job.employer`. #TODO
+* Build lists of `job.description` per `job.employer`. #DONE
+    * Lazy reading of `jobs` data. #DONE
+    * Remove html tags and escaped characters from `job.description`. #DONE
+    * Build `dict` of type `{job.employer: [job.description]}` #DONE
 * Build corpus from lists of `job.description`. #TODO
+    * Remove specific punctuation (new lines, carriage return, etc.)
+    * Convert to lower case. 
+    * Remove stopwords.
+    * Tokenise.
 * Train MWE model on corpus. #TODO
 * Identify valuable MWE. #TODO
 * Identify valuable unigrams. #TODO
@@ -108,6 +115,9 @@
 * Create bespoke class for single user recommendations response object.
 * Create bespoke class for batch user recommendations response object.
 * Create endpoint for retraining recommender model with new/larger data: `recommender/retrain_model`. 
+
+### Text Processing
+
 
 
 ## Future Ideas
