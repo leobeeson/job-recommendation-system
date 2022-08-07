@@ -77,6 +77,7 @@
 * Build lists of `job.description` per `job.employer`. #DONE
     * Lazy reading of `jobs` data. #DONE
     * Remove html tags and escaped characters from `job.description`. #DONE
+    * Remove html control characters (\xa0, \xad, etc) #DONE
     * Build `dict` of type `{job.employer: [job.description]}` #DONE
 * Build corpus from lists of `job.description`. #TODO
     * Remove specific punctuation (new lines, carriage return, etc.)
