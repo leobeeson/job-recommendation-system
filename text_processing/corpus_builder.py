@@ -1,35 +1,47 @@
-from smart_open import open
 from collections import defaultdict
 from lxml.html import fromstring
 from lxml.html.clean import Cleaner
+from smart_open import open
 
 import json
 
 
-corpus_filepath = "../dataset/jobs.jsonl"
+class CorpusBuilder:
 
-cleaner = Cleaner(style=True)
+    cleaner: Cleaner  = Cleaner(style=True)
+    corpus: dict[str:list[str]] = None
 
-def process_job(job: dict) -> str:
-    title = job["title"]
-    description = job["description"]
-    description = remove_html_from_text(description)
-    job_text = f"{title}\n\n{description}"
-    return job_text
- 
+    def __init__(self, jobs_filepath: str) -> None:
+        self.jobs_filepath = jobs_filepath
+        self.read_jobs_data()
 
-def remove_html_from_text(text: str) -> str:
-    html_element = fromstring(text)
-    html_cleaner = cleaner.clean_html(html_element)
-    clean_text = html_cleaner.text_content()
-    return clean_text
+    def read_jobs_data(self) -> None:
+        corpus = defaultdict(list)
+        for job in open(corpus_filepath):
+            job = json.loads(job)
+            employer = job["employer"]
+            job_text = self.process_job(job)
+            corpus[employer].append(job_text)
+        self.corpus = corpus
+    
+    @staticmethod
+    def process_job(job: dict) -> str:
+        title = job["title"]
+        description = job["description"]
+        description = CorpusBuilder.remove_html_from_text(description)
+        job_text = f"{title}\n\n{description}"
+        return job_text
+
+    @staticmethod
+    def remove_html_from_text(text: str) -> str:
+        html_element = fromstring(text)
+        html_cleaner = CorpusBuilder.cleaner.clean_html(html_element)
+        clean_text = html_cleaner.text_content()
+        return clean_text
 
 
-corpus = defaultdict(list)
-for job in open(corpus_filepath):
-    job = json.loads(job)
-    employer = job["employer"]
-    job_text = process_job(job)
-    corpus[employer].append(job_text)
-
+if __name__ == "__main__":
+    corpus_filepath = "../dataset/jobs.jsonl"
+    corpus_builder = CorpusBuilder(corpus_filepath)
+    corpus_builder.corpus[list(corpus_builder.corpus.keys())[0]]
 
