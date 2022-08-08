@@ -1,11 +1,7 @@
 from collections import defaultdict
-from collections import OrderedDict
-import time
-from tracemalloc import stop
 from lxml.html import fromstring
 from lxml.html.clean import Cleaner
 from smart_open import open
-
 
 from gensim.parsing.preprocessing import preprocess_string, strip_tags, strip_punctuation, strip_multiple_whitespaces, remove_stopwords, strip_short
 
@@ -40,7 +36,7 @@ class CorpusBuilder:
     def read_jobs_data(self) -> None:
         corpus = defaultdict(list)
         job_index = {}
-        for job in open(corpus_filepath):
+        for job in open(self.jobs_filepath):
             job = json.loads(job)
             employer = job["employer"]
             job_text = self.process_job(job)
@@ -79,7 +75,7 @@ class CorpusBuilder:
 
     @staticmethod
     def remove_undesirable_chars(text: str) -> str:
-        return re.sub(CorpusBuilder.pattern_undesirable_chars, " ", text)
+        return re.sub(CorpusBuilder.pattern_undesirable_chars, "", text)
 
 
     def tokenise_text(self, corpus_raw: dict[str:list[str]]) -> None:
